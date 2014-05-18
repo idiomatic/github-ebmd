@@ -1,0 +1,4 @@
+package main
+
+const OAUTH2_CLIENT_ID = "..."
+const OAUTH2_CLIENT_SECRET = "..."

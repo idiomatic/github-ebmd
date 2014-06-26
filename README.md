@@ -73,6 +73,14 @@ are listed (labeled `sheddable`).
     | @user2   | 68 days | 138 days |   100% |     200% | #226      |
     | @user3   |     TBD |          |        |          |           |
 
+which renders like:
+
+| assignee    |    done | estimate | avail. | velocity | sheddable |
+|-------------|--------:|---------:|-------:|---------:|-----------|
+| [@user1](#) | 10 days |  10 days |    88% |     110% | [#239](#) |
+| [@user2](#) | 68 days | 138 days |   100% |     200% | [#226](#) |
+| [@user3](#) |     TBD |          |        |          |           |
+
 ## Caveats
 
 If either *CIE* or *AT(start..now)* are 0, *V* is 100%.  This

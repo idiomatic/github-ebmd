@@ -1,0 +1,24 @@
+html
+  body
+    h1 github api testbed
+
+    h2 APIs
+    p: a(href="https://developer.github.com/v3/") GitHub API
+    p: a(href="https://developer.github.com/v3/oauth/") GitHub API OAuth
+
+    h2 Modules
+    p: a(href="https://github.com/mikeal/request") request module
+
+    h2 Registration
+    p: a(href="https://github.com/settings/applications/99651") github-embd application
+
+    h2 identity
+    h2 authentication
+    a(href="#{authorize_uri}") authorize
+    if access_token
+      p access token #{JSON.stringify(access_token)}
+    h2 get your organizations
+    h2 get repositories
+    h2 get milestones
+    h2 get issues with comments by milestone
+    h2 update milestone description

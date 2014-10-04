@@ -1,0 +1,13 @@
+{
+  "name": "github-ebmd",
+  "description": "Evidence-based Milestone Deadlines",
+  "readme": "...",
+  "repository": "https://github.com/idiomatic/github-ebmd.git",
+  "dependencies": {
+    "express": "*",
+    "express-session": "*",
+    "iced-coffee-script": "*",
+    "jade": "*",
+    "request": "*"
+  }
+}

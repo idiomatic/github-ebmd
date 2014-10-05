@@ -1,4 +1,19 @@
+doctype html
 html
+  head
+    style.
+      .org {}
+      .repo {margin-left: 3em;}
+      .has_issues {display: inline-block; padding-left: 0.3em;}
+      .milestone {margin-left: 6em;}
+      .milestone > .title {display: inline-block;}
+      .milestone > .number {display: inline-block; padding-left: 0.3em;}
+      .issue {margin-left: 9em;}
+      .issue > .number {display: inline-block;}
+      .issue > .state {display: inline-block; padding-left: 0.3em;}
+      .issue > .title {display: inline-block; padding-left: 0.3em;}
+      .issue > .label {display: inline-block; padding-left: 0.3em;}
+      .issue > .body {display: none;}
   body
     h1 github api testbed
 
@@ -15,50 +30,30 @@ html
     h2 identity
     h2 authentication
     a(href="#{authorize_uri}") authorize
-    if access_token
-      p access token: #{JSON.stringify(access_token)}
-    if repos
-      h2 get repositories
-      pre
-        for repo in repos
-          | #{repo.full_name}
-          = "\n"
+
+    //
+      h2 repos
+      for repo in repos
+        .repo= repo.full_name
+
     if orgs
-      h2 get your organizations
-      pre
-        for org in orgs
-          | #{org.login}
-          = "\n"
-    if orgs
-      h2 your organization repos
+      h2 results
       for org in orgs
-        p #{org.login}
-        pre
-          for repo in org.repos
-            | #{repo.full_name}
+        .org= org.login
+        for repo in org.repos
+          .repo= repo.full_name
             if repo.has_issues
-              |  (has issues)
-            = "\n"
-    if orgs
-      h2 get milestones
-      for org in orgs
-        for repo in org.repos
-          p #{org.login} #{repo.full_name}
-          pre
-            for milestone in repo.milestones
-              | #{milestone.title} (##{milestone.number})
-              = "\n"
-    if orgs
-      h2 get issues
-      for org in orgs
-        for repo in org.repos
+              .has_issues (has issues)
           for milestone in repo.milestones
-            p #{org.login} #{repo.full_name} #{milestone.title}
-            pre
-              for issue in milestone.issues
-                | #{issue.number} #{issue.state} #{issue.title}
+            .milestone
+              .title= milestone.title
+              if milestone.number != "none"
+                .number ##{milestone.number}
+            for issue in milestone.issues
+              .issue
+                .number= issue.number
+                .state= issue.state
+                .title= issue.title
                 for label in issue.labels
-                  |  [#{label.name}]
-                = "\n"
-    h2 get issue comments
-    h2 update milestone description
+                  .label [#{label.name}]
+                .body= issue.body

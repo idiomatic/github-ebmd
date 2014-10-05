@@ -7,12 +7,10 @@ session = require 'express-session'
 jade = require 'jade'
 request = require 'request'
 
-client_id = '8595c1cb95b9fc25b02d'
-client_secret = 'd31554e4db1694bcb4346f251594eae335a86872'
+{client_id, client_secret, port, secret} = require './config'
+
 user_agent = 'github-embd'
-port = 8080
 scope = 'repo,read:org'
-secret = 'hackath0n'
 per_page = 100
 max_pages = 3
 

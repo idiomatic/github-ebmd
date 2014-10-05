@@ -16,9 +16,49 @@ html
     h2 authentication
     a(href="#{authorize_uri}") authorize
     if access_token
-      p access token #{JSON.stringify(access_token)}
-    h2 get your organizations
-    h2 get repositories
-    h2 get milestones
-    h2 get issues with comments by milestone
+      p access token: #{JSON.stringify(access_token)}
+    if repos
+      h2 get repositories
+      pre
+        for repo in repos
+          | #{repo.full_name}
+          = "\n"
+    if orgs
+      h2 get your organizations
+      pre
+        for org in orgs
+          | #{org.login}
+          = "\n"
+    if orgs
+      h2 your organization repos
+      for org in orgs
+        p #{org.login}
+        pre
+          for repo in org.repos
+            | #{repo.full_name}
+            if repo.has_issues
+              |  (has issues)
+            = "\n"
+    if orgs
+      h2 get milestones
+      for org in orgs
+        for repo in org.repos
+          p #{org.login} #{repo.full_name}
+          pre
+            for milestone in repo.milestones
+              | #{milestone.title} (##{milestone.number})
+              = "\n"
+    if orgs
+      h2 get issues
+      for org in orgs
+        for repo in org.repos
+          for milestone in repo.milestones
+            p #{org.login} #{repo.full_name} #{milestone.title}
+            pre
+              for issue in milestone.issues
+                | #{issue.number} #{issue.state} #{issue.title}
+                for label in issue.labels
+                  |  [#{label.name}]
+                = "\n"
+    h2 get issue comments
     h2 update milestone description

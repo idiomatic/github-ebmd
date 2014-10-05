@@ -136,10 +136,11 @@ app.get '/', (req, res, next) ->
             for org in orgs
                 for repo in org.repos
                     {full_name} = repo
-                    repo.milestones.none = {number:'none', title:'none'}
+                    repo.milestones.push {number:'none', title:'none'}
                     for milestone in repo.milestones
                         {number, title} = milestone
                         req.github.issues {repo:full_name, milestone:number, state:'all'}, defer err[title], milestone.issues
+        # XXX comments
     res.render 'index', {inspect:util.inspect, authorize_uri, token, repos, orgs}
 app.get '/oauth2callback', (req, res, next) ->
     {code, state} = req.query

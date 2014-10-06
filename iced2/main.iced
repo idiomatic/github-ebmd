@@ -41,18 +41,19 @@ app.use (req, res, next) ->
 
 
 class GitHub
-    constructor: (@access_token) ->
+    constructor: (@access_token, @options={}) ->
     authorize_uri: (req) ->
         {redirect_uri, session:{state}} = req
         urlTweak 'https://github.com/login/oauth/authorize',
             query: {client_id, redirect_uri, scope, state}
+        @options.body =? 'raw'   # or text, html, full
     get: (uri, query, cb) ->
         # XXX automatic pager?
         return cb new Error "not authorized" unless @access_token
         options =
             url: urlTweak uri, {query}
             headers:
-                Accept: 'application/vnd.github.v3+json'
+                Accept: 'application/vnd.github.v3.#{@options.body}+json'
                 Authorization: "token #{@access_token}"
                 'User-Agent': user_agent
         await request.get options, defer err, response, body
@@ -106,15 +107,22 @@ class GitHub
         @getAll uri, query, cb
     comments: (args..., cb) ->
         {repo, number} = query = args[0] or {}
-        uri = "https://api.github.com/repos/#{repo}/issues/#{number}/comments"
-        @get uri, query, cb
+        uri = switch true
+            when number?
+                delete query.number
+                delete query.repo
+                "https://api.github.com/repos/#{repo}/issues/#{number}/comments"
+            when repo?
+                delete query.repo
+                "https://api.github.com/repos/#{repo}/issues/comments"
+        @getAll uri, query, cb
         
 
 app.get '/', (req, res, next) ->
     {token} = req.session
     github = new GitHub token?.access_token
+    err = {}
     if token
-        err = {}
         await
             github.repos defer err.repos, repos
             github.orgs defer err.orgs, orgs
@@ -128,18 +136,27 @@ app.get '/', (req, res, next) ->
                 for repo in org.repos
                     repo.milestones = {}
                     {full_name, milestones} = repo
-                    github.milestones {repo:full_name}, defer err[full_name], repo.milestones
+                    github.milestones {repo:full_name}, defer err["#{login} #{full_name}"], repo.milestones
         await
             for org in orgs
+                {login} = org
                 for repo in org.repos
                     {full_name} = repo
                     repo.milestones.push {number:'none', title:'none'}
                     for milestone in repo.milestones
                         {number, title} = milestone
-                        github.issues {repo:full_name, milestone:number, state:'all'}, defer err[title], milestone.issues
-        # XXX comments
+                        github.issues {repo:full_name, milestone:number, state:'all'}, defer err["#{login} #{full_name} #{title}"], milestone.issues
+        await
+            for org in orgs
+                {login} = org
+                for repo in org.repos
+                    {full_name} = repo
+                    for milestone in repo.milestones
+                        for issue in milestone.issues
+                            {number} = issue
+                            github.comments {repo:full_name, number}, defer err["#{login} #{full_name} #{number}"], issue.comments
     authorize_uri = github.authorize_uri req
-    res.render 'index', {inspect:util.inspect, authorize_uri, token, repos, orgs}
+    res.render 'index', {inspect:util.inspect, authorize_uri, token, repos, orgs, err}
 
 app.get '/oauth2callback', (req, res, next) ->
     {code, state} = req.query

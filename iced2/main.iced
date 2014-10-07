@@ -167,7 +167,8 @@ app.get '/', (req, res, next) ->
                     for milestone in repo.milestones
                         for issue in milestone.issues
                             {number} = issue
-                            github.comments {repo:full_name, number}, defer err["#{login} #{full_name} #{number}"], issue.comments
+                            since = '2001-01-01T00:00:00Z'
+                            github.comments {repo:full_name, number, since}, defer err["#{login} #{full_name} #{number}"], issue.comments
     authorize_uri = github.authorize_uri req
     res.render 'index', {inspect:util.inspect, authorize_uri, token, repos, orgs, err}
 

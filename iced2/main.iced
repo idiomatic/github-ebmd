@@ -58,6 +58,8 @@ class GitHub
                 'User-Agent': user_agent
         await request.get options, defer err, response, body
         return cb err if err
+        if response.headers['x-ratelimit-remaining'] is '0'
+            return cb new Error "rate limit exceeded.  try again after #{new Date(response.headers['x-ratelimit-reset'] * 1000)}"
         return cb null, JSON.parse body
     getAll: (uri, query, cb) ->
         all_items = []

@@ -42,11 +42,11 @@ app.use (req, res, next) ->
 
 class GitHub
     constructor: (@access_token, @options={}) ->
+        @options.body ?= 'raw'   # or text, html, full
     authorize_uri: (req) ->
         {redirect_uri, session:{state}} = req
         urlTweak 'https://github.com/login/oauth/authorize',
             query: {client_id, redirect_uri, scope, state}
-        @options.body =? 'raw'   # or text, html, full
     get: (uri, query, cb) ->
         # XXX automatic pager?
         return cb new Error "not authorized" unless @access_token

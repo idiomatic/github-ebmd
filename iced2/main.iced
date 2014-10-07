@@ -83,11 +83,17 @@ class GitHub
                 'https://api.github.com/user/orgs'
         @get uri, query, cb
     repos: (args..., cb) ->
-        {org} = query = args[0] or {}
+        {org, username} = query = args[0] or {}
         uri = switch true
             when org?
                 delete query.org
                 "https://api.github.com/orgs/#{org}/repos"
+            when username?
+                delete query.username
+                "https://api.github.com/users/#{username}/repos"
+            when query.public?
+                delete query.public
+                'https://api.github.com/repos'
             else
                 'https://api.github.com/user/repos'
         @get uri, query, cb
@@ -96,14 +102,17 @@ class GitHub
         uri = "https://api.github.com/repos/#{repo}/milestones"
         @get uri, query, cb
     issues: (args..., cb) ->
-        {repo, org} = query = args[0] or {}
+        {repo, org, user} = query = args[0] or {}
         uri = switch true
             when repo?
                 delete query.repo
                 "https://api.github.com/repos/#{repo}/issues"
-            when org?
+            when org
                 delete query.org
                 "https://api.github.com/orgs/#{org}/issues"
+            when org?
+                delete query.org
+                'https://api.github.com/user/issues'
             else
                 "https://api.github.com/issues"
         @getAll uri, query, cb
@@ -117,6 +126,8 @@ class GitHub
             when repo?
                 delete query.repo
                 "https://api.github.com/repos/#{repo}/issues/comments"
+            else
+                cb new Error "repo required"
         @getAll uri, query, cb
         
 

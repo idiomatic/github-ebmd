@@ -140,18 +140,18 @@ app.get '/', (req, res, next) ->
             github.repos defer err.repos, repos
             github.orgs defer err.orgs, orgs
         await
-            for org in orgs
+            for org in orgs or []
                 {login} = org
                 github.repos {org:login}, defer err[login], org.repos
         await
-            for org in orgs
+            for org in orgs or []
                 {login} = org
                 for repo in org.repos
                     repo.milestones = {}
                     {full_name, milestones} = repo
                     github.milestones {repo:full_name}, defer err["#{login} #{full_name}"], repo.milestones
         await
-            for org in orgs
+            for org in orgs or []
                 {login} = org
                 for repo in org.repos
                     {full_name} = repo
@@ -160,7 +160,7 @@ app.get '/', (req, res, next) ->
                         {number, title} = milestone
                         github.issues {repo:full_name, milestone:number, state:'all'}, defer err["#{login} #{full_name} #{title}"], milestone.issues
         await
-            for org in orgs
+            for org in orgs or []
                 {login} = org
                 for repo in org.repos
                     {full_name} = repo

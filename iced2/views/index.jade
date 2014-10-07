@@ -3,21 +3,30 @@ html
   head
     style.
       .org {}
-      .repo {margin-left: 3em;}
-      .has_issues {display: inline-block; padding-left: 0.3em;}
-      .milestone {margin-left: 6em;}
-      .milestone > .title {display: inline-block;}
-      .milestone > .number {display: inline-block; padding-left: 0.3em;}
-      .issue {margin-left: 9em;}
-      .issue > .number {display: inline-block;}
-      .issue > .state {display: inline-block; padding-left: 0.3em;}
-      .issue > .title {display: inline-block; padding-left: 0.3em;}
-      .issue > .label {display: inline-block; padding-left: 0.3em;}
-      .issue > .body {font-size: 60%; white-space: pre-wrap;}
-      .issue > .comment {font-size: 60%;}
-      .issue > .comment > .user {display: inline-block; font-weight: bold;}
-      .issue > .comment > .updated_at {display: inline-block; padding-left: 0.3em;}
-      .issue > .comment > .body {margin-left: 3em; white-space: pre-wrap;}
+      .repo,
+      .milestone,
+      .issue,
+      .issue > .comment {margin-left: 3em;}
+      .issue > .state {font-variant: small-caps;}
+      .issue {border-top: 1px solid grey; margin-top: 2em;}
+      .issue > .label {border-radius:0.5em; background-color: #eee; font-size: 70%; padding: 3px;}
+      .issue .user {font-weight: bold;}
+      .issue > .body {margin-top: 1em;}
+      .issue > .comment {border-top: 1px solid grey;}
+      .issue > .body,
+      .issue > .comment > .body {font-size: 70%; white-space: pre-wrap; margin-bottom: 2em;}
+      .org > .login,
+      .repo > .full_name,
+      .milestone > .title,
+      .issue > .number,
+      .issue .comment .user {display: inline-block;}
+      .repo > .has_issues,
+      .milestone > .number,
+      .issue > .state,
+      .issue > .title,
+      .issue > .label,
+      .issue > .user,
+      .issue .updated_at {display: inline-block; margin-left: 0.3em;}
   body
     h1 github api testbed
 
@@ -35,7 +44,7 @@ html
     h2 authentication
     a(href="#{authorize_uri}") authorize
 
-    //
+    if repos
       h2 repos
       for repo in repos
         .repo= repo.full_name
@@ -43,28 +52,32 @@ html
     if orgs
       h2 results
       for org in orgs
-        .org= org.login
-        for repo in org.repos
-          .repo= repo.full_name
-            if repo.has_issues
-              .has_issues (has issues)
-          for milestone in repo.milestones
-            .milestone
-              .title= milestone.title
-              if milestone.number != "none"
-                .number ##{milestone.number}
-            for issue in milestone.issues
-              .issue
-                .number= issue.number
-                .state= issue.state
-                .title= issue.title
-                for label in issue.labels
-                  .label [#{label.name}]
-                .body= issue.body
-                for comment in issue.comments
-                  .comment
-                    .user= comment.user.login
-                    .updated_at= comment.updated_at
-                    .body= comment.body
+        .org
+          .login= org.login
+          for repo in org.repos
+            .repo
+              .full_name= repo.full_name
+              if repo.has_issues
+                .has_issues (has issues)
+              for milestone in repo.milestones
+                .milestone
+                  .title= milestone.title
+                  if milestone.number != "none"
+                    .number ##{milestone.number}
+                  for issue in milestone.issues
+                    .issue
+                      .number= issue.number
+                      .state= issue.state
+                      .title= issue.title
+                      for label in issue.labels
+                        .label(style="background-color:##{label.color};") #{label.name}
+                      .user= issue.user.login
+                      .updated_at= issue.updated_at
+                      .body= issue.body
+                      for comment in issue.comments
+                        .comment
+                          .user= comment.user.login
+                          .updated_at= comment.updated_at
+                          .body= comment.body
     h2 errors
     pre= inspect(err)
